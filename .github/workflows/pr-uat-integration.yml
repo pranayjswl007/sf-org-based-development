@@ -74,15 +74,15 @@ jobs:
       - name: "Check-only deploy delta changes - run specified tests"
         if: ${{ env.APEX_TESTS != 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
+          sf project deploy validate  --source-dir "changed-sources/force-app" --check-only --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
 
       # Check-only deploy delta changes and run all tests
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunLocalTests
+          sf project deploy validate  --source-dir "changed-sources/force-app" --check-only --test-level RunLocalTests
 
       # Deploy destructive changes (if any)
       - name: "Deploy destructive changes (if any)"
         run: |
-          sf project deploy metadata --source-dir "changed-sources/destructiveChanges" --check-only --ignore-warnings
+          sf project deploy validate --source-dir "changed-sources/destructiveChanges" --check-only --ignore-warnings
