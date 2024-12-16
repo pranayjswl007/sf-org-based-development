@@ -21,10 +21,12 @@ jobs:
         env:
           PR_BODY: ${{github.event.pull_request.body}}
         run: |
-          echo $PR_BODY > devops/pr_body.txt
-          python3 devops/pr_to_tests.py           
-          TESTS=$(cat devops/testsToRun.txt)       
+          cd devops/
+          echo $PR_BODY > pr_body.txt
+          python3 pr_to_tests.py           
+          TESTS=$(cat testsToRun.txt)       
           echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+          cd..
 
       # Install SF CLI
       - name: "Install Salesforce CLI"
