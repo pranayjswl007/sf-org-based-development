@@ -79,6 +79,6 @@ jobs:
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests --post-destructive-changes changed-sources/destructiveChanges
+          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests
 
       # Deploy destructive changes (if any) to do handle it
