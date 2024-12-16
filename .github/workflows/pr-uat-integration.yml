@@ -37,6 +37,15 @@ jobs:
           echo "$HOME/sf/bin" >> $GITHUB_PATH
           ~/sf/bin/sf version
 
+      # Install SFDX scanner
+      - name: "Installing SFDX scanner"
+        run: sfdx plugins:install @salesforce/sfdx-scanner
+
+      - name: "Installing sfdx git delta"
+        run: |
+          echo y | sfdx plugins:install sfdx-git-delta
+          sfdx plugins
+
       # Authenticate to Salesforce org using an SFDX Auth URL
       - name: "Authenticate to Integration Org"
         run: |
