@@ -1,0 +1,77 @@
+name: Validate PR on uat-integration branch
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [uat-integration]
+    paths:
+      - "force-app/**"
+
+jobs:
+  validate-pr-on-uat:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
+    steps:
+      - name: "Checkout source code"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Read PR Body"
+        env:
+          PR_BODY: ${{github.event.pull_request.body}}
+        run: |
+          echo $PR_BODY > ./pr_body.txt
+          python3 /devops/pr_to_tests.py           
+          TESTS=$(cat testsToRun.txt)       
+          echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+
+      # Install SF CLI
+      - name: "Install Salesforce CLI"
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sf/channels/stable/sf-linux-x64.tar.xz
+          mkdir ~/sf
+          tar xJf sf-linux-x64.tar.xz -C ~/sf --strip-components 1
+          echo "$HOME/sf/bin" >> $GITHUB_PATH
+          ~/sf/bin/sf version
+
+      # Authenticate to Salesforce org using an SFDX Auth URL
+      - name: "Authenticate to Integration Org"
+        run: |
+          echo ${{ secrets.SFDX_INTEGRATION_URL }} > ./SFDX_INTEGRATION_URL.txt
+          sf org login sfdx-url -f ./SFDX_INTEGRATION_URL.txt --alias integration --set-default
+
+      # Create delta packages for new, modified, or deleted metadata
+      - name: "Create delta packages for new, modified, or deleted metadata"
+        run: |
+          mkdir changed-sources
+          sf project deploy delta generate --to "HEAD" --from "HEAD^" --output changed-sources/ --source-dir force-app/
+
+      # Scan code
+      - name: "Scan code"
+        run: |
+          cd changed-sources
+          sf scanner run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
+          cd ..
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: changed-sources/apexScanResults.sarif
+
+      # Check-only deploy delta changes and run specified tests
+      - name: "Check-only deploy delta changes - run specified tests"
+        if: ${{ env.APEX_TESTS != 'all' }}
+        run: |
+          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
+
+      # Check-only deploy delta changes and run all tests
+      - name: "Check-only deploy delta changes - run all tests"
+        if: ${{ env.APEX_TESTS == 'all' }}
+        run: |
+          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunLocalTests
+
+      # Deploy destructive changes (if any)
+      - name: "Deploy destructive changes (if any)"
+        run: |
+          sf project deploy metadata --source-dir "changed-sources/destructiveChanges" --check-only --ignore-warnings
