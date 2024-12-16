@@ -1,4 +1,4 @@
-@isTest
+@isTest(seeAllData=true)
 public with sharing class MyControllerTest {
     
     @isTest
