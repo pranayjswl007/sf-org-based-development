@@ -56,7 +56,7 @@ jobs:
       - name: "Create delta packages for new, modified, or deleted metadata"
         run: |
           mkdir changed-sources 
-          sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/
+          sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
 
       # Scan code
       - name: "Scan code"
@@ -82,7 +82,7 @@ jobs:
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunLocalTests
+          sf project deploy validate  --source-dir "changed-sources/package" --test-level RunLocalTests
 
       # Deploy destructive changes (if any)
       - name: "Deploy destructive changes (if any)"
