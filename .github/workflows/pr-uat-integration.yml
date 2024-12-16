@@ -62,10 +62,7 @@ jobs:
       - name: "Scan code"
         run: |
           cd changed-sources
-          ls
           sf scanner run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
-          cd ..
-          ls
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
@@ -76,13 +73,13 @@ jobs:
       - name: "Check-only deploy delta changes - run specified tests"
         if: ${{ env.APEX_TESTS != 'all' }}
         run: |
-          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
+          sf project validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
 
       # Check-only deploy delta changes and run all tests
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy validate  --source-dir "changed-sources/package" --test-level RunLocalTests
+          sf project validate  --source-dir "changed-sources/force-app" --test-level RunLocalTests
 
       # Deploy destructive changes (if any)
       - name: "Deploy destructive changes (if any)"
