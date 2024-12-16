@@ -47,7 +47,7 @@ jobs:
       - name: "Create delta packages for new, modified, or deleted metadata"
         run: |
           mkdir changed-sources
-          sf project deploy delta generate --to "HEAD" --from "HEAD^" --output changed-sources/ --source-dir force-app/
+          sf sgd source delta --to "HEAD" --from "HEAD^" --output changed-sources/ --source-dir force-app/
 
       # Scan code
       - name: "Scan code"
