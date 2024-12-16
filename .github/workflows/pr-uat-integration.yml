@@ -84,4 +84,4 @@ jobs:
       # Deploy destructive changes (if any)
       - name: "Deploy destructive changes (if any)"
         run: |
-          sf project deploy validate --source-dir "changed-sources/destructiveChanges" --ignore-warnings
+          sf project validate --source-dir "changed-sources/destructiveChanges" --ignore-warnings
