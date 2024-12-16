@@ -21,10 +21,12 @@ jobs:
         env:
           PR_BODY: ${{github.event.pull_request.body}}
         run: |
-          echo $PR_BODY > ./pr_body.txt
-          python3 /devops/pr_to_tests.py           
-          TESTS=$(cat testsToRun.txt)       
+          cd devops/
+          echo $PR_BODY > pr_body.txt
+          python3 pr_to_tests.py           
+          TESTS=$(cat tests_to_run.txt)       
           echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+          cd ..
 
       # Install SF CLI
       - name: "Install Salesforce CLI"
@@ -35,6 +37,15 @@ jobs:
           echo "$HOME/sf/bin" >> $GITHUB_PATH
           ~/sf/bin/sf version
 
+      # Install SFDX scanner
+      - name: "Installing SFDX scanner"
+        run: sfdx plugins:install @salesforce/sfdx-scanner
+
+      - name: "Installing sfdx git delta"
+        run: |
+          echo y | sfdx plugins:install sfdx-git-delta
+          sfdx plugins
+
       # Authenticate to Salesforce org using an SFDX Auth URL
       - name: "Authenticate to Integration Org"
         run: |
@@ -44,15 +55,14 @@ jobs:
       # Create delta packages for new, modified, or deleted metadata
       - name: "Create delta packages for new, modified, or deleted metadata"
         run: |
-          mkdir changed-sources
-          sf project deploy delta generate --to "HEAD" --from "HEAD^" --output changed-sources/ --source-dir force-app/
+          mkdir changed-sources 
+          sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
 
       # Scan code
       - name: "Scan code"
         run: |
           cd changed-sources
           sf scanner run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
-          cd ..
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
@@ -63,15 +73,12 @@ jobs:
       - name: "Check-only deploy delta changes - run specified tests"
         if: ${{ env.APEX_TESTS != 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
+          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
 
       # Check-only deploy delta changes and run all tests
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunLocalTests
+          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests
 
-      # Deploy destructive changes (if any)
-      - name: "Deploy destructive changes (if any)"
-        run: |
-          sf project deploy metadata --source-dir "changed-sources/destructiveChanges" --check-only --ignore-warnings
+      # Deploy destructive changes (if any) to do handle it
