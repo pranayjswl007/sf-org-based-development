@@ -9,9 +9,11 @@ github_repository = os.environ.get('GITHUB_REPOSITORY')
 github_token = os.environ.get('GITHUB_TOKEN')
 commit_id = os.environ.get('COMMIT_ID')
 
-print(f"PR Number: {pr_number}")
+
 print(f"GitHub Repository: {github_repository}")
 print(f"GitHub Token: {github_token}")
+print(f"PR Number: {pr_number}")
+print(f"commit_id: {commit_id}")
 
 # Get the path to the PMD violations file
 pmd_violations_file = "changed-sources/apexScanResults.json"
