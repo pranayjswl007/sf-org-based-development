@@ -14,7 +14,7 @@ print(f"GitHub Repository: {github_repository}")
 print(f"GitHub Token: {github_token}")
 
 # Get the path to the PMD violations file
-pmd_violations_file = "apexScanResults.json"
+pmd_violations_file = "changed-sources/apexScanResults.json"
 
 # Read the PMD violations file as JSON
 try:
