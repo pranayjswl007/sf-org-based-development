@@ -33,6 +33,8 @@ for violation in pmd_violations:
     
     # Get the file path and line number of the violation
     file_path = violation["fileName"]
+    print("file path is ")
+    print(file_path)
     file_path = file_path.split("changed-sources/force-app/main/default/classes/")[1]
     print(f"File Path: {file_path}")
     
