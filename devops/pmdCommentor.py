@@ -57,7 +57,7 @@ for violation in pmd_violations:
             
 
         }
-    comments.append(comment)
+        comments.append(comment)
     
 
 print(json.dumps(comments))
