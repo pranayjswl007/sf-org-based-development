@@ -6,7 +6,7 @@ import requests  # Add this import
 
 pr_number = os.environ.get('PR_NUMBER')
 github_repository = os.environ.get('GITHUB_REPOSITORY')
-github_token = os.environ.get('GITHUB_TOKEN')
+github_token = os.environ.get('TOKEN_GITHUB')
 commit_id = os.environ.get('COMMIT_ID')
 
 
