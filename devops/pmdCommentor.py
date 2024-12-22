@@ -38,7 +38,7 @@ for violation in pmd_violations:
     file_path = violation["fileName"]
     print("file path is ")
     print(file_path)
-    file_path = file_path.split("changed-sources")[1]
+    file_path = file_path.split("changed-sources/")[1]
     print(f"File Path: {file_path}")
     
     for vo in violation['violations']:
