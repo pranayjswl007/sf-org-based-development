@@ -65,6 +65,13 @@ jobs:
           sf scanner run --format json --target './**/*.cls' -e pmd  --outfile 'apexScanResults.json'
           cd ..
 
+      - name: Set Environment Variables
+        run: |
+          echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> $GITHUB_ENV
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+
       - name: "post comment to github"
         run: |
           python3 devops/pmdCommentor.py
