@@ -62,12 +62,11 @@ jobs:
       - name: "Scan code"
         run: |
           cd changed-sources
-          sf scanner run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
-
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: changed-sources/apexScanResults.sarif
+          sf scanner run --format json --target './**/*.cls' -e eslint-lwc, --outfile 'apexScanResults.json'
+      
+      - name: "post comment to github"
+          run: |
+            python3 pmdCommentor.py
 
       # Check-only deploy delta changes and run specified tests
       - name: "Check-only deploy delta changes - run specified tests"
