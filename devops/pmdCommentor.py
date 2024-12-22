@@ -57,7 +57,9 @@ for violation in pmd_violations:
 
     }
     comments.append(comment)
+    
 
+print(json.dumps(comments))
 # Set the headers for the API request
 headers = {
     "Authorization": f"Bearer {github_token}",
