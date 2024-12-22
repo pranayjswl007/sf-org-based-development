@@ -63,10 +63,10 @@ jobs:
         run: |
           cd changed-sources
           sf scanner run --format json --target './**/*.cls' -e eslint-lwc, --outfile 'apexScanResults.json'
-      
+
       - name: "post comment to github"
-          run: |
-            python3 pmdCommentor.py
+        run: |
+          python3 pmdCommentor.py
 
       # Check-only deploy delta changes and run specified tests
       - name: "Check-only deploy delta changes - run specified tests"
