@@ -22,6 +22,7 @@ jobs:
           PR_BODY: ${{github.event.pull_request.body}}
         run: |
           cd devops/
+          echo $PR_BODY
           echo $PR_BODY > pr_body.txt
           python3 pr_to_tests.py           
           TESTS=$(cat tests_to_run.txt)       
