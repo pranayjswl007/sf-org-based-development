@@ -62,7 +62,7 @@ jobs:
       - name: "Scan code"
         run: |
           cd changed-sources
-          sf scanner run --format json --target './**/*.cls' -e eslint-lwc, --outfile 'apexScanResults.json'
+          sf scanner run --format json --target './**/*.cls' -e pmd  --outfile 'apexScanResults.json'
 
       - name: "post comment to github"
         run: |
