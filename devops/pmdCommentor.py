@@ -22,6 +22,7 @@ pmd_violations_file = "changed-sources/apexScanResults.json"
 try:
     with open(pmd_violations_file, "r") as file:
         pmd_violations = json.load(file)
+        print(json.dumps(pmd_violations))
 except FileNotFoundError:
     print(f"Error: The file {pmd_violations_file} was not found.")
     exit(1)
@@ -47,15 +48,15 @@ for violation in pmd_violations:
             endLine = line_number + 1
 
     # Create a comment for the violation
-    comment = {
-        "path": file_path,
-        "line": line_number,
-        "side": "RIGHT", 
-        "commit_id": commit_id,
-        "body": f"PMD Violation: {vo['message']}"
-        
+        comment = {
+            "path": file_path,
+            "line": line_number,
+            "side": "RIGHT", 
+            "commit_id": commit_id,
+            "body": f"PMD Violation: {vo['message']}"
+            
 
-    }
+        }
     comments.append(comment)
     
 
