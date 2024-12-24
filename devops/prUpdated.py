@@ -8,6 +8,7 @@ YELLOW_TEXT = '\033[33m'
 RED_TEXT = '\033[31m'
 BOLD_TEXT = '\033[1m'
 RESET = '\033[0m'
+CYAN_BG = '\033[46m'
 
 
 
