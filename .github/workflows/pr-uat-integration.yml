@@ -81,14 +81,14 @@ jobs:
       - name: "Check-only deploy delta changes - run specified tests"
         if: ${{ env.APEX_TESTS != 'all' }}
         run: |
-          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}  > deploymentResult.json
+          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }} --json > deploymentResult.json
           cat deploymentResult.json
 
       # Check-only deploy delta changes and run all tests
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests  > deploymentResult.json
+          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests --json > deploymentResult.json
           cat deploymentResult.json
 
       - name: "Update the PR body with the latest content to allow quick validation and summary"
