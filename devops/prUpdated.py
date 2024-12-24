@@ -2,6 +2,8 @@ import os
 import json
 
 import requests  # Add this import
+import pprint
+
 
 GREEN_TEXT = '\033[32m'
 YELLOW_TEXT = '\033[33m'
@@ -29,7 +31,8 @@ deployment_file = "deploymentResult.json"
 try:
     with open(deployment_file, "r") as file:
         validation_result = json.load(file)
-        print(json.dumps(validation_result))
+        pprint.pprint(validation_result)
+       
 except FileNotFoundError:
     print(f"{CYAN_BG}{RED_TEXT}Error: The file {deployment_file} was not found.{RESET}")
     exit(1)
