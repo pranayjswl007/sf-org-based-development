@@ -27,6 +27,7 @@ print(f"commit_id: {commit_id}")
 
 # Get the path to the PMD violations file
 deployment_file = "deploymentResult.json"
+pr_body_file = "pr_body.txt"
 
 try:
     with open(deployment_file, "r") as file:
@@ -39,4 +40,19 @@ except FileNotFoundError:
 except json.JSONDecodeError:
     print(f"{CYAN_BG}{RED_TEXT}Error: The file {deployment_file} is not a valid JSON file.{RESET}")
     exit(1)
+
+
+prefixText =""
+try:
+    with open(pr_body_file, "r") as file:
+       for line in file:
+           if "### DO NOT EDIT AFTER THIS" in line:
+               break
+           else:
+               prefixText+=line
+                 
+except FileNotFoundError:
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {pr_body_file} was not found.{RESET}")
+    exit(1)
+
 
