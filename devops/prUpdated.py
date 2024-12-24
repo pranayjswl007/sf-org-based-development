@@ -31,9 +31,9 @@ try:
         validation_result = json.load(file)
         print(json.dumps(validation_result))
 except FileNotFoundError:
-    print(f"{CYAN_BG}{RED_TEXT}Error: The file {validation_result} was not found.{RESET}")
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {deployment_file} was not found.{RESET}")
     exit(1)
 except json.JSONDecodeError:
-    print(f"{CYAN_BG}{RED_TEXT}Error: The file {validation_result} is not a valid JSON file.{RESET}")
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {deployment_file} is not a valid JSON file.{RESET}")
     exit(1)
 
