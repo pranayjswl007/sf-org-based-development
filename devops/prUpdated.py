@@ -17,3 +17,15 @@ print(f"commit_id: {commit_id}")
 
 # Get the path to the PMD violations file
 deployment_file = "deploymentResult.json"
+
+try:
+    with open(deployment_file, "r") as file:
+        validation_result = json.load(file)
+        print(json.dumps(validation_result))
+except FileNotFoundError:
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {validation_result} was not found.{RESET}")
+    exit(1)
+except json.JSONDecodeError:
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {validation_result} is not a valid JSON file.{RESET}")
+    exit(1)
+
