@@ -21,10 +21,13 @@ jobs:
         env:
           PR_BODY: ${{github.event.pull_request.body}}
         run: |
-          echo $PR_BODY > ./pr_body.txt
-          python3 /devops/pr_to_tests.py           
-          TESTS=$(cat testsToRun.txt)       
+          cd devops/
+          echo $PR_BODY
+          echo $PR_BODY > pr_body.txt
+          python3 pr_to_tests.py           
+          TESTS=$(cat tests_to_run.txt)       
           echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV
+          cd ..
 
       # Install SF CLI
       - name: "Install Salesforce CLI"
@@ -35,6 +38,15 @@ jobs:
           echo "$HOME/sf/bin" >> $GITHUB_PATH
           ~/sf/bin/sf version
 
+      # Install SFDX scanner
+      - name: "Installing SFDX scanner"
+        run: sfdx plugins:install @salesforce/sfdx-scanner
+
+      - name: "Installing sfdx git delta"
+        run: |
+          echo y | sfdx plugins:install sfdx-git-delta
+          sfdx plugins
+
       # Authenticate to Salesforce org using an SFDX Auth URL
       - name: "Authenticate to Integration Org"
         run: |
@@ -44,34 +56,42 @@ jobs:
       # Create delta packages for new, modified, or deleted metadata
       - name: "Create delta packages for new, modified, or deleted metadata"
         run: |
-          mkdir changed-sources
-          sf project deploy delta generate --to "HEAD" --from "HEAD^" --output changed-sources/ --source-dir force-app/
+          mkdir changed-sources 
+          sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
 
       # Scan code
       - name: "Scan code"
         run: |
           cd changed-sources
-          sf scanner run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'
+          sf scanner run --format json --target './**/*.cls' -e pmd  --outfile 'apexScanResults.json'
           cd ..
 
-      - name: Upload SARIF file
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: changed-sources/apexScanResults.sarif
+      - name: Set Environment Variables
+        run: |
+          echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
+          echo "GITHUB_REPOSITORY=${{ github.repository }}" >> $GITHUB_ENV
+          echo "TOKEN_GITHUB=${{ secrets.TOKEN_GITHUB }}" >> $GITHUB_ENV
+          echo "COMMIT_ID=${{ github.event.pull_request.head.sha }}" >> $GITHUB_ENV
+
+      - name: "post comment to github"
+        run: |
+          python3 devops/pmdCommentor.py
 
       # Check-only deploy delta changes and run specified tests
       - name: "Check-only deploy delta changes - run specified tests"
         if: ${{ env.APEX_TESTS != 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }}
+          sf project deploy validate  --source-dir "changed-sources/force-app" --test-level RunSpecifiedTests --tests ${{ env.APEX_TESTS }} --json > deploymentResult.json
+          cat deploymentResult.json
 
       # Check-only deploy delta changes and run all tests
       - name: "Check-only deploy delta changes - run all tests"
         if: ${{ env.APEX_TESTS == 'all' }}
         run: |
-          sf project deploy start --source-dir "changed-sources/force-app" --check-only --test-level RunLocalTests
+          sf project deploy validate --source-dir "changed-sources/force-app" --test-level RunLocalTests --json > deploymentResult.json
+          cat deploymentResult.json
 
-      # Deploy destructive changes (if any)
-      - name: "Deploy destructive changes (if any)"
+      - name: "Update the PR body with the latest content to allow quick validation and summary"
         run: |
-          sf project deploy metadata --source-dir "changed-sources/destructiveChanges" --check-only --ignore-warnings
+          python3 devops/prUpdated.py
+      # Deploy destructive changes (if any) to do handle it
