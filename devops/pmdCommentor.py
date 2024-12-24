@@ -3,6 +3,14 @@ import json
 
 import requests  # Add this import
 
+GREEN_TEXT = '\033[32m'
+YELLOW_TEXT = '\033[33m'
+RED_TEXT = '\033[31m'
+BOLD_TEXT = '\033[1m'
+RESET = '\033[0m'
+
+
+
 
 pr_number = os.environ.get('PR_NUMBER')
 github_repository = os.environ.get('GITHUB_REPOSITORY')
@@ -24,10 +32,10 @@ try:
         pmd_violations = json.load(file)
         print(json.dumps(pmd_violations))
 except FileNotFoundError:
-    print(f"Error: The file {pmd_violations_file} was not found.")
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {pmd_violations_file} was not found.{RESET}")
     exit(1)
 except json.JSONDecodeError:
-    print(f"Error: The file {pmd_violations_file} is not a valid JSON file.")
+    print(f"{CYAN_BG}{RED_TEXT}Error: The file {pmd_violations_file} is not a valid JSON file.{RESET}")
     exit(1)
 
 # Create comments for each violation
@@ -81,5 +89,8 @@ for comment in comments:
     if response.status_code == 201:
         print("Comment created successfully.")
     else:
-        print(f"Failed to create comment. Status code: {response.status_code}")
-        print(f"Response: {response.json()}")  # Print the response for more details
+        print(f"{CYAN_BG}{RED_TEXT}Failed to create comment. Status code: {response.status_code}{RESET}")
+        print(f"{CYAN_BG}{RED_TEXT}Response: {response.json()}{RESET}")
+        exit(1)
+
+print(f"{GREEN_TEXT} PMD Commentor step executed successfully")
