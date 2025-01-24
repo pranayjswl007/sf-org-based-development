@@ -31,7 +31,9 @@
         <inputAssignments>
             <field>Name</field>
             <value>
-                <stringValue>TEST123</stringValue>
+
+                <stringValue>Hello</stringValue>
+
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
