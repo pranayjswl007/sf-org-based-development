@@ -32,7 +32,7 @@
             <field>Name</field>
             <value>
 
-                <stringValue>&quot;Test&quot;</stringValue>
+                <stringValue>Hello World</stringValue>
 
             </value>
         </inputAssignments>
