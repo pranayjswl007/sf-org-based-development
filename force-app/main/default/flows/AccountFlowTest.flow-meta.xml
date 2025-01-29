@@ -31,7 +31,9 @@
         <inputAssignments>
             <field>Name</field>
             <value>
+
                 <stringValue>Happy</stringValue>
+
             </value>
         </inputAssignments>
         <inputReference>$Record</inputReference>
