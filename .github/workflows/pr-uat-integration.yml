@@ -3,7 +3,7 @@ name: Validate PR on uat-integration branch
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [uat-integration]
+    branches: [xyxxyA]
     paths:
       - "force-app/**"
 
